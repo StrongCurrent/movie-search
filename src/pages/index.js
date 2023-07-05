@@ -3,16 +3,26 @@ import Image from "next/image";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import useSWR from "swr";
+import { useState } from "react";
 
 export default function Home() {
+  const [movieData, setMovieData] = useState(null);
   // API URL incl Key
-  const query = "Peterchens Mondfahrt";
+  const query = "The Day after";
   const api_key = "bfec423d56be8f848e042b16b5c9ad74";
   const api_url = "https://api.themoviedb.org/3/";
   const base_url = `${api_url}search/movie?query=${query}&api_key=${api_key}`;
 
   const { data, error, isLoading } = useSWR(base_url);
+
   console.log(data);
+  if (isLoading) {
+    console.log("Loading...");
+  }
+
+  if (error) {
+    console.error(error.massage);
+  }
   return (
     <>
       <Head>
@@ -21,7 +31,30 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main></main>
+      <main>
+        <h1>MetaMovie</h1>
+        <form>
+          <input type="text" name="search" id="search"></input>
+          <button type="submit">Search</button>
+        </form>
+        <section className="movie-list">
+          {data.results.map((movie) => {
+            return (
+              <article key={movie.id} className="movie-card">
+                <div className="movie-img"></div>
+                <div className="movie-details">
+                  <h2>{movie.title}</h2>
+                  <ul className="movie-detail__list">
+                    <li>{movie.release_date}</li>
+                    <li>{movie.vote_average}</li>
+                  </ul>
+                  <p className="movie-description">{movie.overview}</p>
+                </div>
+              </article>
+            );
+          })}
+        </section>
+      </main>
     </>
   );
 }
