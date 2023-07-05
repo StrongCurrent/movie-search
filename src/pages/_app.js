@@ -7,7 +7,7 @@ async function myFetcher(url) {
   const response = await fetch(url);
   // Response to data format .json
   const data = await response.json();
-  return data();
+  return data;
 }
 
 export default function App({ Component, pageProps }) {
