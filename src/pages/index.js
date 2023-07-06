@@ -1,27 +1,33 @@
 import Head from "next/head";
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
 import useSWR from "swr";
-import { useState } from "react";
+import MovieCard from "../../components/MovieCard";
 
 export default function Home() {
-  const [movieData, setMovieData] = useState(null);
   // API URL incl Key
-  const query = "The Day after";
+  const query = "Volcano";
   const api_key = "bfec423d56be8f848e042b16b5c9ad74";
   const api_url = "https://api.themoviedb.org/3/";
   const base_url = `${api_url}search/movie?query=${query}&api_key=${api_key}`;
+  const imagePath = `${api_url}configuration?&api_key=${api_key}`;
 
-  const { data, error, isLoading } = useSWR(base_url);
+  const {
+    data: movieData,
+    error: movieError,
+    isLoading: movieLoading,
+  } = useSWR(base_url);
 
-  console.log(data);
-  if (isLoading) {
-    console.log("Loading...");
+  const {
+    data: imageData,
+    error: imageError,
+    isLoading: imageLoading,
+  } = useSWR(imagePath);
+
+  if (imageLoading || movieLoading) {
+    return "Loading...";
   }
 
-  if (error) {
-    console.error(error.massage);
+  if (imageError || movieError) {
+    return error.massage;
   }
   return (
     <>
@@ -38,21 +44,7 @@ export default function Home() {
           <button type="submit">Search</button>
         </form>
         <section className="movie-list">
-          {data.results.map((movie) => {
-            return (
-              <article key={movie.id} className="movie-card">
-                <div className="movie-img"></div>
-                <div className="movie-details">
-                  <h2>{movie.title}</h2>
-                  <ul className="movie-detail__list">
-                    <li>{movie.release_date}</li>
-                    <li>{movie.vote_average}</li>
-                  </ul>
-                  <p className="movie-description">{movie.overview}</p>
-                </div>
-              </article>
-            );
-          })}
+          <MovieCard movieData={movieData} imageData={imageData} />
         </section>
       </main>
     </>
